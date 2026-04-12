@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 import pytest
-from utils.helpers import wait_for_async_operation, delete_file, upload_file
+from utils.helpers import wait_for_async_operation, delete_file, upload_file, random_string
 from utils.assertions import assert_status_code, assert_match, assert_key_in_data, assert_status_in, assert_is_not_in
 
 
@@ -26,7 +26,7 @@ def test_unpublish_file(client, tmp_file):
     assert_status_code(unpub_resp, 200)
 
 def test_copy_file(client, tmp_file):
-    copy_path = "copy.txt"
+    copy_path = random_string()
     copy_resp = client.resources.copy(tmp_file, copy_path)
     if copy_resp.status_code == 202:
         wait_for_async_operation(client, copy_resp)
@@ -38,8 +38,8 @@ def test_copy_file(client, tmp_file):
     delete_file(client, copy_path)
 
 def test_move_file(client, tmp_file):
-    move_path = "dir_to_move"
-    moved_file_name = "/moved.txt"
+    move_path = random_string()
+    moved_file_name = "/"+random_string()
     client.resources.create_folder(move_path)
     move_resp = client.resources.move(tmp_file, move_path+moved_file_name)
     if (move_resp.status_code == 202):
@@ -53,7 +53,7 @@ def test_move_file(client, tmp_file):
     delete_file(client, move_path)
 
 def test_create_folder(client):
-    folder_path = "/test_folder"
+    folder_path = random_string()
     resp = client.resources.create_folder(folder_path)
     assert_status_in(resp, (200, 201))
 
@@ -63,7 +63,7 @@ def test_create_folder(client):
 
 def test_upload_file(client):
     content = "https://yandex.ru/"
-    file_path = "test_upload.txt"
+    file_path = random_string()
     resp = client.resources.upload(file_path, content)
     wait_for_async_operation(client, resp)
     assert_status_in(resp, (200, 202))
@@ -155,7 +155,8 @@ def test_get_short_info(client, tmp_file):
     assert_status_code(resp, 200)
 
 def test_get_link_for_download(client):
-    resp = client.resources.get_upload_link("test.txt")
+    path = random_string()
+    resp = client.resources.get_upload_link(path)
     assert_status_code(resp, 200)
     data = resp.json()
     assert_key_in_data("https://uploader", data["href"])

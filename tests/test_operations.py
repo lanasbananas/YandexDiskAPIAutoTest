@@ -1,8 +1,8 @@
-from utils.helpers import extract_operation_id, delete_file
+from utils.helpers import extract_operation_id, delete_file, random_string
 from utils.assertions import assert_is_key_not_none, assert_status_code
 
 def test_get_operation_id_async(client):
-    file_path = "test.txt"
+    file_path = random_string()
     resp = client.resources.upload(file_path, "https://yandex.ru/")
     operation_id = extract_operation_id(resp)
     resp = client.operations.get_status(operation_id)

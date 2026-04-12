@@ -1,3 +1,6 @@
+import string
+import random
+
 def extract_operation_id(response):
     try:
         data = response.json()
@@ -42,3 +45,6 @@ def upload_file(client, file_path):
     resp = client.resources.upload(file_path, "https://yandex.ru/")
     if resp.status_code == 202:
         wait_for_async_operation(client, resp)
+
+def random_string(length: int = 6) -> str:
+    return ''.join(random.choices(string.ascii_lowercase, k=length))

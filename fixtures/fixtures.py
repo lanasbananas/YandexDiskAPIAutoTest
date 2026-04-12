@@ -1,26 +1,28 @@
 import pytest
-from utils.helpers import wait_for_async_operation
+from utils.helpers import wait_for_async_operation, random_string
 
-TEST_FOLDER_PATH = "test_folder"
-TEST_FILE_NAME = "test.txt"
+
 TEST_URL = "https://yandex.ru/"
 
 @pytest.fixture(scope="function")
 def tmp_file(client):
-    resp = client.resources.upload(TEST_FILE_NAME, TEST_URL)
-    wait_for_async_operation(client, resp)
+    filename = random_string()
+    resp = client.resources.upload(filename, TEST_URL)
+    if resp.status_code == 202:
+        wait_for_async_operation(client, resp)
 
-    yield TEST_FILE_NAME
-    delete_resp = client.resources.delete(TEST_FILE_NAME)
+    yield filename
+    delete_resp = client.resources.delete(filename)
     if delete_resp.status_code == 202:
         wait_for_async_operation(client, delete_resp)
 
 @pytest.fixture(scope="function")
 def tmp_dir(client):
-    client.resources.create_folder(TEST_FOLDER_PATH)
+    dirname = random_string()
+    client.resources.create_folder(dirname)
 
-    yield TEST_FOLDER_PATH
-    delete_resp = client.resources.delete(TEST_FOLDER_PATH)
+    yield dirname
+    delete_resp = client.resources.delete(dirname)
     if delete_resp.status_code == 202:
         wait_for_async_operation(client, delete_resp)
 
