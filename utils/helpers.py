@@ -48,3 +48,8 @@ def upload_file(client, file_path):
 
 def random_string(length: int = 6) -> str:
     return ''.join(random.choices(string.ascii_lowercase, k=length))
+
+def get_trash_files_json(client):
+    resp = client.trash.get(f"trash:/")
+    data = resp.json()
+    return data

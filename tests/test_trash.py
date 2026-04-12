@@ -1,11 +1,10 @@
-from utils.helpers import fill_trash, wait_for_async_operation, clear_trash, delete_file
+from utils.helpers import fill_trash, wait_for_async_operation, clear_trash, delete_file, get_trash_files_json
 from utils.assertions import assert_status_code, assert_status_in, assert_match, assert_is_not_in
 
 
 def test_move_to_trash_and_clear_all(client, tmp_file, tmp_dir):
     fill_trash(client, tmp_dir, tmp_file)
-    resp = client.trash.get(f"trash:/")
-    data = resp.json()
+    data = get_trash_files_json(client)
     trash_files = [item["path"] for item in data["_embedded"]["items"]]
     trash_tmp_dir = trash_files[-2]
     trash_tmp_file = trash_files[-1]
@@ -22,8 +21,7 @@ def test_move_to_trash_and_clear_all(client, tmp_file, tmp_dir):
 
 def test_move_to_trash_and_clear_file(client, tmp_file, tmp_dir):
     fill_trash(client, tmp_dir, tmp_file)
-    resp = client.trash.get(f"trash:/")
-    data = resp.json()
+    data = get_trash_files_json(client)
     trash_files = [item["path"] for item in data["_embedded"]["items"]]
     trash_tmp_dir = trash_files[-2]
     trash_tmp_file = trash_files[-1]
@@ -54,8 +52,7 @@ def test_get_trash_info(client, tmp_file, tmp_dir):
 def test_restore_trash(client, tmp_file, tmp_dir):
     clear_trash(client)
     fill_trash(client, tmp_dir, tmp_file)
-    resp = client.trash.get(f"trash:/")
-    data = resp.json()
+    data = get_trash_files_json(client)
     trash_files = [item["path"] for item in data["_embedded"]["items"]]
     trash_tmp_dir = trash_files[-2]
     trash_tmp_file = trash_files[-1]
