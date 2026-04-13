@@ -1,6 +1,7 @@
 import pytest
 from utils.helpers import get_public_key, wait_for_async_operation
 from utils.assertions import assert_status_code, assert_match, assert_key_in_data, assert_status_in
+from urllib.parse import urlparse, parse_qs
 
 def test_get_public_meta(client, tmp_file):
     public_settings = {"read_only": True}
@@ -18,16 +19,16 @@ def test_get_download_link_public(client, tmp_file):
     data = resp.json()
     assert_key_in_data("https://downloader.disk.yandex.ru/disk", data["href"])
 
-@pytest.mark.skip("Не понятно какой путь передавать - ничего не подходит")
+@pytest.mark.xfail(reason='404')
 def test_update_public(client, tmp_file):
     public_settings_update = {
-          "available_until": 1000,
-          "accesses": [
-              ]
+          "available_until": 7643934
         }
-    public_settings = {"read_only": True}
-    client.resources.publish(tmp_file, public_settings)
-    resp_upload = client.public.update_public_settings(tmp_file, public_settings_update)
+    public_settings = {"read_only": False}
+    resp = client.resources.publish(tmp_file, public_settings)
+    data = resp.json()
+    path = data["href"].split('path=')[1]
+    resp_upload = client.public.update_public_settings(path, public_settings_update)
     assert_status_code(resp_upload, 200)
 
 def test_download_public(client, tmp_file):

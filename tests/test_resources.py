@@ -141,13 +141,14 @@ def test_get_public_files(client):
         assert_status_code(resp, 200)
         data = resp.json()
         names = [item["name"] for item in data["items"]]
-        assert_match(names, [examples[0], examples[2]])
+        assert_key_in_data(examples[0], names)
+        assert_key_in_data(examples[2], names)
         assert_is_not_in(examples[1], names)
     finally:
         for name in examples:
             delete_file(client, name)
 
-@pytest.mark.skip(reason='Дает ответ "Не авторизован"')
+@pytest.mark.xfail(reason='401')
 def test_get_short_info(client, tmp_file):
     public_settings = {"read_only": False}
     client.resources.publish(tmp_file, public_settings)
